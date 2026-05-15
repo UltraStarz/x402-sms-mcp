@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>x402 SMS — Paid SMS for AI Agents</title>
+<meta name="description" content="A Model Context Protocol (MCP) server that lets AI agents send SMS messages, billed per-message in USDC over the x402 payment protocol.">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --fg: #e8e8e8;
+    --muted: #888;
+    --accent: #4f8cff;
+    --border: #222;
+    --card: #111;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.65;
+    font-size: 16px;
+  }
+  .container { max-width: 760px; margin: 0 auto; padding: 60px 24px 80px; }
+  h1 { font-size: 2.2rem; margin: 0 0 8px; letter-spacing: -0.02em; }
+  h2 { font-size: 1.35rem; margin: 40px 0 12px; letter-spacing: -0.01em; }
+  h3 { font-size: 1.05rem; margin: 24px 0 8px; color: var(--fg); }
+  p { margin: 0 0 14px; color: var(--fg); }
+  .tagline { color: var(--muted); font-size: 1.05rem; margin-bottom: 32px; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+  pre {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin: 16px 0;
+  }
+  .sample-msg {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    background: #0d1a2e;
+    border-left: 3px solid var(--accent);
+    padding: 10px 14px;
+    margin: 8px 0;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+  ul { padding-left: 22px; }
+  li { margin: 6px 0; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 50px 0; }
+  .footer { color: var(--muted); font-size: 0.85rem; margin-top: 40px; }
+  .badge {
+    display: inline-block;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-right: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>x402 SMS</h1>
+  <p class="tagline">A paid SMS service for AI agents, billed per-message in USDC.</p>
+
+  <div>
+    <span class="badge">MCP-compatible</span>
+    <span class="badge">x402 protocol</span>
+    <span class="badge">USDC on Base</span>
+  </div>
+
+  <h2>What this service does</h2>
+  <p>
+    x402 SMS is a Model Context Protocol (MCP) server operated by Joseph Henry, sole proprietor.
+    It exposes a single tool — <code>send_sms</code> — that AI agents (Claude, ChatGPT, and other
+    LLM-based systems) can call to send SMS text messages to phone numbers their end users have
+    consented to receive messages from.
+  </p>
+  <p>
+    Each <code>send_sms</code> call is billed $0.03 USDC, settled on-chain via the
+    <a href="https://x402.org" rel="noopener">x402 payment protocol</a>. No accounts, no
+    pre-funding — payment happens per request.
+  </p>
+
+  <h2>Who uses this</h2>
+  <p>
+    Software developers and AI application builders who want their AI agents to send transactional
+    SMS notifications without integrating a full CPaaS account. Common use cases include:
+  </p>
+  <ul>
+    <li>Order and shipment status notifications</li>
+    <li>Workflow completion alerts</li>
+    <li>System health and monitoring alerts</li>
+    <li>Calendar and meeting reminders</li>
+    <li>Personal task reminders triggered by AI assistants</li>
+  </ul>
+  <p>
+    The service is <strong>not</strong> intended for marketing, promotional content, political
+    messaging, or any high-risk SHAFT-C (sex, hate, alcohol, firearms, tobacco, cannabis) content.
+  </p>
+
+  <h2>Sample messages</h2>
+  <p>The following are representative of the SMS content sent through this service:</p>
+
+  <div class="sample-msg">
+    [x402-sms] Your order #1042 has shipped. Tracking: 1Z999AA10123456784. Reply STOP to opt out.
+  </div>
+  <div class="sample-msg">
+    [x402-sms] Reminder: Project review meeting in 15 minutes at 2:00 PM. Reply STOP to opt out.
+  </div>
+  <div class="sample-msg">
+    [x402-sms] Alert: Production deploy completed successfully. Build #4821. Reply STOP to opt out.
+  </div>
+  <div class="sample-msg">
+    [x402-sms] Workflow "Daily Report" finished at 9:01 AM. View output via dashboard. Reply STOP to opt out.
+  </div>
+
+  <h2>How opt-in works</h2>
+  <p>
+    Recipient consent is mandatory and is the responsibility of the AI agent operator using this
+    service. Before any SMS is dispatched, the operator must have obtained express written consent
+    from the recipient via one of the following methods:
+  </p>
+  <ul>
+    <li>The recipient registered their phone number with the operator's product (website,
+        application, or service) and explicitly opted in to receive SMS notifications.</li>
+    <li>The recipient is the operator themselves (self-notifications to their own number).</li>
+    <li>The recipient provided their number with clear notice of SMS use during a transaction
+        with the operator.</li>
+  </ul>
+  <p>
+    When an agent calls the <code>send_sms</code> tool, the operator must include an
+    <code>opt_in_attestation</code> parameter confirming that the recipient has consented. Our
+    Terms of Service make the operator solely responsible for maintaining records of consent in
+    compliance with the TCPA and applicable state law. Calls without this attestation are rejected.
+  </p>
+
+  <h2>STOP and HELP keywords</h2>
+  <p>
+    The service automatically honors industry-standard SMS keywords. Recipients can text any of
+    the following words to <strong>+1 (888) 841-3236</strong> to control their messages:
+  </p>
+  <ul>
+    <li><code>STOP</code>, <code>STOPALL</code>, <code>UNSUBSCRIBE</code>, <code>CANCEL</code>,
+        <code>END</code>, <code>QUIT</code> — opts the recipient out of all future messages from
+        this number. The opt-out is permanent and applies to all operators using this service.</li>
+    <li><code>HELP</code>, <code>INFO</code> — returns an automated reply identifying the service
+        and providing the contact email below.</li>
+    <li><code>START</code>, <code>UNSTOP</code> — re-enables messages for a previously opted-out
+        recipient (requires the original consent to still be valid).</li>
+  </ul>
+  <p>
+    The opt-out list is maintained at the phone-number level and persists across all operators.
+    Once a recipient sends STOP, no further messages will be sent to that number from this service
+    regardless of which operator initiates the call.
+  </p>
+
+  <h2>Message frequency</h2>
+  <p>
+    Frequency varies by operator and use case. The service is transactional and event-driven —
+    messages are sent in response to discrete events triggered by AI agents on behalf of consenting
+    recipients. Typical recipients receive between 1 and 20 messages per month. The service is not
+    used for recurring scheduled campaigns or bulk broadcasts.
+  </p>
+
+  <h2>Pricing</h2>
+  <p>
+    $0.03 USDC per SMS message, charged to the AI agent's wallet at the time of the API call via
+    the x402 protocol. No subscription, no minimum spend, no recipient-side fees.
+  </p>
+
+  <h2>Terms of Service</h2>
+  <p>
+    By using this service, AI agent operators agree to the following terms:
+  </p>
+  <ul>
+    <li>Operator has obtained express consent from each recipient before initiating any SMS.</li>
+    <li>Operator will not send marketing, promotional, political, or SHAFT-C content.</li>
+    <li>Operator will not send messages to numbers on the National Do Not Call Registry without
+        established business relationship documentation.</li>
+    <li>Operator is solely responsible for compliance with the Telephone Consumer Protection Act
+        (TCPA), CAN-SPAM, CTIA messaging principles, and applicable state laws.</li>
+    <li>Operator will retain proof of consent for a minimum of four (4) years and produce it on
+        request.</li>
+    <li>The service operator (x402 SMS) may immediately suspend or terminate access for any
+        violation, suspected violation, or carrier complaint.</li>
+    <li>USDC payments are non-refundable once a message is dispatched to a carrier.</li>
+  </ul>
+
+  <h2>Privacy Policy</h2>
+  <p>
+    x402 SMS collects and processes the following data:
+  </p>
+  <ul>
+    <li><strong>Recipient phone numbers</strong> — used solely to deliver the requested SMS.
+        Stored for 90 days for delivery confirmation and compliance audit, then deleted.</li>
+    <li><strong>Message content</strong> — stored for 30 days for delivery troubleshooting and
+        carrier complaint response, then deleted.</li>
+    <li><strong>Wallet addresses</strong> — public blockchain addresses used to settle x402
+        payments. Retained indefinitely as part of immutable payment records.</li>
+    <li><strong>Opt-out records</strong> — phone numbers that have texted STOP are retained
+        indefinitely to honor the opt-out across future requests.</li>
+  </ul>
+  <p>
+    Data is never sold, rented, or shared with third parties except as required by law or to
+    fulfill the SMS delivery itself (Twilio is the carrier-facing service provider).
+  </p>
+
+  <h2>Contact</h2>
+  <p>
+    Operator: Joseph Henry (sole proprietor)<br>
+    Email: <a href="mailto:jehenry87@icloud.com">jehenry87@icloud.com</a><br>
+    Service phone: +1 (888) 841-3236<br>
+    Source code (MCP client): <a href="https://github.com/UltraStarz/x402-sms-mcp">github.com/UltraStarz/x402-sms-mcp</a>
+  </p>
+
+  <hr>
+
+  <div class="footer">
+    <p>
+      x402 SMS is operated by Joseph Henry as a sole proprietorship in the United States.
+      SMS delivery is provided by Twilio Inc. under Twilio's standard messaging terms.
+      This page serves as the public-facing compliance disclosure required for toll-free
+      messaging verification.
+    </p>
+    <p>Last updated: May 14, 2026.</p>
+  </div>
+
+</div>
+</body>
+</html>

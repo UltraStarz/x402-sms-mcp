@@ -1,6 +1,6 @@
 {
   "name": "x402-sms-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "MCP server for paid SMS. Agents pay $0.03 USDC per call to send a transactional SMS to a US phone number via x402.",
   "type": "module",
   "bin": {

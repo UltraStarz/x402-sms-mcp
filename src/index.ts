@@ -47,7 +47,7 @@ const fetchWithPay = wrapFetchWithPayment(fetch, account);
 const server = new Server(
   {
     name: "x402-sms",
-    version: "0.1.0",
+    version: "0.2.0",
   },
   {
     capabilities: { tools: {} },
@@ -165,6 +165,72 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const elapsedMs = Date.now() - start;
 
     if (!res.ok) {
+      // Distinct messaging for each known seller error shape, so the agent
+      // can explain to the user precisely what happened and whether to retry.
+      const sellerError = typeof body.error === "string" ? body.error : "";
+
+      // 503 with delivery_pending_tfv_approval — seller refused before Twilio,
+      // no payment taken. Agent should NOT retry immediately.
+      if (
+        res.status === 503 &&
+        sellerError === "delivery_pending_tfv_approval"
+      ) {
+        const submittedAt =
+          typeof body.tfv_submitted_at === "string"
+            ? body.tfv_submitted_at
+            : "unknown";
+        return {
+          isError: true,
+          content: [
+            {
+              type: "text",
+              text:
+                `SMS not sent — service is in pre-launch wait.\n\n` +
+                `The seller's Twilio toll-free number is still in regulatory review ` +
+                `(toll-free verification, submitted ${submittedAt}). ` +
+                `Even if Twilio accepts the message, US carriers will reject it ` +
+                `at handoff with error 30032 until verification completes.\n\n` +
+                `No payment was taken from the buyer wallet. ` +
+                `Do not retry — try again in a few days, or check service status ` +
+                `at the seller URL. ` +
+                `If this is urgent, set SMS_URL to point at a different (verified) ` +
+                `x402 SMS seller.\n\n` +
+                `Full response:\n${JSON.stringify(body, null, 2)}`,
+            },
+          ],
+        };
+      }
+
+      // 429 from per-wallet rate limit — buyer hit their quota. No payment taken.
+      if (res.status === 429 && sellerError === "rate_limited") {
+        const retryAfter =
+          typeof body.retry_after_seconds === "number"
+            ? body.retry_after_seconds
+            : undefined;
+        const window =
+          typeof body.window === "string" ? body.window : "minute";
+        const limit = body.limit ?? "?";
+        return {
+          isError: true,
+          content: [
+            {
+              type: "text",
+              text:
+                `SMS not sent — this buyer wallet hit the per-${window} rate limit ` +
+                `(${limit}/${window}).\n\n` +
+                `No payment was taken. ` +
+                (retryAfter
+                  ? `Retry after ${retryAfter} seconds.`
+                  : `Retry shortly.`) +
+                `\n\nIf you need higher throughput, contact the seller operator ` +
+                `or shard sends across multiple buyer wallets.\n\n` +
+                `Full response:\n${JSON.stringify(body, null, 2)}`,
+            },
+          ],
+        };
+      }
+
+      // Generic / Twilio-side error. Surface the Twilio hint if present.
       const twilioCode =
         typeof body.twilio_code === "number" ? body.twilio_code : undefined;
       const hint = twilioCode ? TWILIO_HINTS[twilioCode] : undefined;
@@ -212,6 +278,6 @@ const transport = new StdioServerTransport();
 await server.connect(transport);
 
 console.error(
-  `x402-sms-mcp v0.1.0 ready. ` +
+  `x402-sms-mcp v0.2.0 ready. ` +
     `Buyer: ${account.address} | Target: ${SMS_URL}`,
 );

@@ -9,7 +9,7 @@ Each `send_sms` tool call:
 
 No API keys. No Twilio account. The agent pays the toll, the message goes out.
 
-> **Status: Public beta on Base Sepolia (testnet).** The seller's toll-free number is undergoing Twilio TFV approval (typically 3-5 business days from May 2026). During this window the payment flow works end-to-end on chain but Twilio will reject undelivered messages with code `30032`. Once approved, messages will deliver and pricing flips to Base mainnet.
+> **Status (2026-05-22): Public beta on Base Sepolia (testnet).** The seller's toll-free number is undergoing Twilio TFV approval (submitted 2026-05-14, still in queue). During this window `/send` calls short-circuit to a `503 delivery_pending_tfv_approval` response **before** the buyer wallet signs anything, so no USDC is moved. The day Twilio approves the number, delivery flips on; pricing flips to Base mainnet shortly after.
 
 ## Install in Claude Desktop / Cursor / Windsurf
 
@@ -80,6 +80,18 @@ If you have any doubt about consent, **do not call this tool.**
 
 To point the MCP server at your own seller deployment, override `SMS_URL`.
 
+## Errors you might see
+
+The MCP surfaces three distinct error shapes so the model can explain what happened to the user and decide whether to retry.
+
+| Cause                                                                   | What you'll see in chat                                                                                | Was payment taken? |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | :----------------: |
+| Seller's toll-free number still in TFV review (`HTTP 503`)              | "SMS not sent — service is in pre-launch wait" + the seller's submitted date and retry guidance         |        no          |
+| Buyer wallet exceeded per-minute/hour/day rate limit (`HTTP 429`)        | "SMS not sent — this buyer wallet hit the per-X rate limit" + `retry_after_seconds`                     |        no          |
+| Twilio-side rejection (e.g. invalid number `21211`, opted-out `21610`)  | Friendly hint mapped from the Twilio error code + the full response body                                |   yes (the send tried) |
+
+For the full mapping of Twilio error codes the MCP recognizes, see `TWILIO_HINTS` in `src/index.ts`.
+
 ## How it works
 
 ```
@@ -103,10 +115,10 @@ The MCP server doesn't talk to Twilio directly. It signs an x402 payment with th
 
 ## Roadmap
 
-- **Now**: Testnet (Base Sepolia), TFV pending. Pay flow works, delivery blocked.
-- **Days from now (TFV approval)**: Real US SMS delivery on testnet pricing.
-- **A few weeks (A2P 10DLC Brand approval)**: Higher throughput tier.
-- **Mainnet flip**: Production launch, USDC payments settle on Base mainnet.
+- **Now (2026-05-22):** Base Sepolia testnet, TFV pending. Payment flow verified end-to-end; deliveries gated on Twilio approval.
+- **Once TFV clears:** Real US SMS delivery, testnet pricing held while we collect early traffic.
+- **A few weeks out:** A2P 10DLC Brand approval → higher per-day throughput tier.
+- **Mainnet flip:** Production launch, USDC settles on Base mainnet; Solana facilitator on roadmap after.
 
 ## License
 

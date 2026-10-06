@@ -3,7 +3,7 @@
 A paid MCP server that lets AI agents send SMS messages to US phone numbers.
 
 Each `send_sms` tool call:
-1. Sends a transactional SMS via a verified toll-free number
+1. Sends a transactional SMS via the seller's toll-free number (Twilio verification in progress)
 2. Auto-appends `Reply STOP to opt out` if the body doesn't include opt-out language
 3. Costs **$0.03 USDC** per message, paid automatically from the configured wallet via [x402](https://x402.org)
 
@@ -111,7 +111,7 @@ Claude Desktop ──tool call──> MCP server (this package, on your machine)
                               MCP server ──tool result──> Claude Desktop
 ```
 
-The MCP server doesn't talk to Twilio directly. It signs an x402 payment with the buyer's wallet, sends the payment + message details to the seller endpoint, and the seller's verified toll-free number dispatches the SMS. Your private key never leaves your machine. The seller never sees it.
+The MCP server doesn't talk to Twilio directly. It signs an x402 payment with the buyer's wallet, sends the payment + message details to the seller endpoint, and the seller's toll-free number dispatches the SMS. Your private key never leaves your machine. The seller never sees it.
 
 ## Roadmap
 
